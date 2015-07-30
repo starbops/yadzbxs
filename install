@@ -1,0 +1,40 @@
+#!/bin/sh -e
+
+# Modify config file of php5
+sed -i \
+    -e 's,^post_max_size =.*,post_max_size = 16M,' \
+    -e 's,^max_execution_time.*,max_execution_time = 300,' \
+    -e 's,^max_input_time.*,max_input_time = 300,' \
+    -e 's,;date.timezone.*,date.timezone = Asia/Taipei,' \
+    /etc/php5/apache2/php.ini
+
+# Prepare for zabbix frontend
+ln -s /usr/local/src/zabbix-2.4.5/frontends/php /usr/share/zabbix
+cp /build/assets/conf/zabbix_apache.conf /etc/apache2/conf-available/zabbix.conf
+ln -s /etc/apache2/conf-available/zabbix.conf /etc/apache2/conf-enabled/zabbix.conf
+
+# Fix permission
+mkdir /var/log/zabbix
+chown zabbix:zabbix /var/log/zabbix
+mkdir /var/run/zabbix
+chown zabbix:zabbix /var/run/zabbix
+
+if [ -f /build/scripts/kickstart.sh ]; then
+    echo "link kickstart.sh to /etc/my_init.d/kickstart"
+    ln -s /build/scripts/kickstart.sh /etc/my_init.d/kickstart
+fi
+
+# Enable apache server at system boot up
+if [ -f /build/scripts/apache2.sh ]; then
+    echo "link apache to /etc/service/apache2/run"
+    mkdir -p /etc/service/apache2
+    ln -s /build/scripts/apache2.sh /etc/service/apache2/run
+fi
+
+# Enable zabbix server at system boot up
+if [ -f /build/scripts/zabbix_server.sh ]; then
+    echo "link zabbix_server to /etc/service/zabbix_server/run"
+    mkdir -p /etc/service/zabbix_server
+    ln -s /build/scripts/zabbix_server.sh /etc/service/zabbix_server/run
+fi
+
