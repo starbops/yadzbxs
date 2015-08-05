@@ -20,12 +20,14 @@ $ docker build -t <image> .
 
 ```
 $ docker run -d \
+    -h <hostname> \
     --name zabbix \
     -e DB_ADDRESS=<db_server> \
     -e DB_USER=<username> \
     -e DB_PASS=<password> \
     -v /etc/localtime:/etc/localtime:ro \
-    -p 8888:80 \
+    -p 80:80 \
+    -p 10051:10051 \
     yadzbxs:0.1 /sbin/my_init
 ```
 

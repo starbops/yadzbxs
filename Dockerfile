@@ -20,40 +20,21 @@ COPY assets /build/assets
 RUN \
     apt-get -y update && \
     LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        build-essential \
-        subversion \
-        gcc \
-        automake \
-        make \
-        #zabbix-frontend-php \
-        apache2 \
-        php5 \
-        php5-gd \
-        php5-mcrypt \
-        php5-mysql \
-        libapache2-mod-php5 \
-        mysql-client \
-        libmysqlclient-dev \
-        openjdk-7-jdk \
-        ntp && \
+        build-essential subversion gcc automake make \
+        apache2 php5 php5-gd php5-mcrypt php5-mysql libapache2-mod-php5 \
+        mysql-client libmysqlclient-dev \
+        python python-pip ntp && \
     tar zxvf /build/assets/zabbix-2.4.5.tar.gz -C /usr/local/src && \
     cd /usr/local/src/zabbix-2.4.5 && \
     patch -p0 < /build/assets/foreground.patch && \
     ./configure \
         --enable-server \
         --enable-agent \
-        --with-mysql \
-        --enable-java && \
-        #--with-net-snmp \
-        #--with-libcurl \
-        #--with-libxml2 \
-        #--with-openipmi && \
+        --with-mysql && \
     make install
 
 # Default environment variables.
 ENV \
-    JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/java \
-    JAVA=/usr/lib/jvm/java-1.7.0-openjdk-amd64/bin/java \
     DB_ADDRESS=127.0.0.1 \
     DB_USER=username \
     DB_PASS=password
@@ -64,7 +45,7 @@ COPY install /build/install
 RUN /build/install
 
 # Expose service ports.
-EXPOSE 22 80 10050 10051 10052
+EXPOSE 22 80 10051
 
 # Set up OpenLDAP database and config directory in data volume.
 
