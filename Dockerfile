@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.9.16
+FROM phusion/baseimage:0.9.17
 MAINTAINER Zespre Schmidt <starbops@gmail.com>
 
 # Use baseimage-docker's init system.
@@ -29,14 +29,16 @@ RUN \
     patch -p0 < /build/assets/foreground.patch && \
     ./configure \
         --enable-server \
-        --enable-agent \
         --with-mysql && \
     make install
 
+# Dependencies of Zabbix-related scripts
+RUN \
+    pip install click docker-py slacker zabbix-client
+
 # Default environment variables.
 ENV \
-    DB_ADDRESS=127.0.0.1 \
-    DB_USER=username \
+    DB_USER=zabbix \
     DB_PASS=password
 
 # initialization scripts.

@@ -4,23 +4,23 @@
 cat <<EOF > /usr/local/etc/zabbix_server.conf
 LogFile=/var/log/zabbix/zabbix_server.log
 PidFile=/var/run/zabbix/zabbix_server.pid
-DBHost=${DB_ADDRESS}
+DBHost=mysql
 DBName=zabbix
 DBUser=${DB_USER}
 DBPassword=${DB_PASS}
 EOF
 
-# Bootstrap MySQL Database for zabbix if not exist
-if ! mysql -h ${DB_ADDRESS} -u ${DB_USER} -p${DB_PASS} -e 'use zabbix;'; then
-    mysql -h ${DB_ADDRESS} -u ${DB_USER} -p${DB_PASS} \
+# Bootstrap MySQL Database for zabbix if it is not exist
+if ! mysql -h mysql -u ${DB_USER} -p${DB_PASS} -e 'use zabbix;'; then
+    mysql -h mysql -u ${DB_USER} -p${DB_PASS} \
         -e "CREATE DATABASE IF NOT EXISTS zabbix CHARACTER SET utf8;"
-    mysql -h ${DB_ADDRESS} -u ${DB_USER} -p${DB_PASS} \
+    mysql -h mysql -u ${DB_USER} -p${DB_PASS} \
         -e "GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'%' IDENTIFIED BY '${DB_PASS}';"
 
     ZABBIX_SQL_DIR="/usr/local/src/zabbix-2.4.5/database/mysql/"
-    mysql -h ${DB_ADDRESS} -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/schema.sql
-    mysql -h ${DB_ADDRESS} -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/images.sql
-    mysql -h ${DB_ADDRESS} -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/data.sql
+    mysql -h mysql -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/schema.sql
+    mysql -h mysql -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/images.sql
+    mysql -h mysql -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/data.sql
 fi
 
 # Spam config file for zabbix frontend
@@ -30,7 +30,7 @@ cat <<EOF > /usr/share/zabbix/conf/zabbix.conf.php
 global \$DB;
 
 \$DB['TYPE']     = 'MYSQL';
-\$DB['SERVER']   = '${DB_ADDRESS}';
+\$DB['SERVER']   = 'mysql';
 \$DB['PORT']     = '0';
 \$DB['DATABASE'] = 'zabbix';
 \$DB['USER']     = '${DB_USER}';
