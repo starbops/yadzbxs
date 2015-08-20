@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # Spam config file of zabbix server
 cat <<EOF > /usr/local/etc/zabbix_server.conf
