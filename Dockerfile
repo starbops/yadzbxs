@@ -15,6 +15,9 @@ RUN \
 # Add zabbix user and group.
 RUN groupadd -r zabbix && useradd -r -g zabbix zabbix
 
+# Zabbix version
+ENV ZABBIX_VERSION=2.4.6
+
 # Install zabbix
 COPY assets /build/assets
 RUN \
@@ -23,18 +26,26 @@ RUN \
         build-essential subversion gcc automake make \
         apache2 php5 php5-gd php5-mcrypt php5-mysql libapache2-mod-php5 \
         mysql-client libmysqlclient-dev \
-        python python-pip ntp && \
-    tar zxvf /build/assets/zabbix-2.4.5.tar.gz -C /usr/local/src && \
-    cd /usr/local/src/zabbix-2.4.5 && \
+        libsnmp-dev\
+        libopenipmi-dev ipmitool \
+        libssh2-1-dev \
+        libxml2-dev \
+        python-dev python-pip ntp && \
+    tar zxvf /build/assets/zabbix-${ZABBIX_VERSION}.tar.gz -C /usr/local/src && \
+    cd /usr/local/src/zabbix-${ZABBIX_VERSION} && \
     patch -p0 < /build/assets/foreground.patch && \
     ./configure \
         --enable-server \
-        --with-mysql && \
+        --with-mysql \
+        --with-net-snmp \
+        --with-openipmi \
+        --with-ssh2 \
+        --with-libxml2 && \
     make install
 
 # Dependencies of Zabbix-related scripts
 RUN \
-    pip install click docker-py slacker zabbix-client
+    pip install click docker-py pyghmi slacker zabbix-client
 
 # Default environment variables.
 ENV \

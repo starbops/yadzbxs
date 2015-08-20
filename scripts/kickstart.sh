@@ -8,6 +8,7 @@ DBHost=mysql
 DBName=zabbix
 DBUser=${DB_USER}
 DBPassword=${DB_PASS}
+StartIPMIPollers=3
 EOF
 
 # Bootstrap MySQL Database for zabbix if it is not exist
@@ -17,7 +18,7 @@ if ! mysql -h mysql -u ${DB_USER} -p${DB_PASS} -e 'use zabbix;'; then
     mysql -h mysql -u ${DB_USER} -p${DB_PASS} \
         -e "GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'%' IDENTIFIED BY '${DB_PASS}';"
 
-    ZABBIX_SQL_DIR="/usr/local/src/zabbix-2.4.5/database/mysql/"
+    ZABBIX_SQL_DIR="/usr/local/src/zabbix-${ZABBIX_VERSION}/database/mysql/"
     mysql -h mysql -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/schema.sql
     mysql -h mysql -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/images.sql
     mysql -h mysql -u ${DB_USER} -p${DB_PASS} zabbix < ${ZABBIX_SQL_DIR}/data.sql
