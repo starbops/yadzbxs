@@ -1,5 +1,8 @@
 #!/bin/sh -e
 
+# Turn off friendly warning from apache2
+echo 'ServerName localhost' >> /etc/apache2/apache2.conf
+
 # Modify config file of php5
 sed -i \
     -e 's,^post_max_size =.*,post_max_size = 16M,' \
@@ -19,6 +22,7 @@ chown zabbix:zabbix /var/log/zabbix
 mkdir /var/run/zabbix
 chown zabbix:zabbix /var/run/zabbix
 
+# Kickstart before any other services boot up
 if [ -f /build/scripts/kickstart.sh ]; then
     echo "link kickstart.sh to /etc/my_init.d/kickstart"
     ln -s /build/scripts/kickstart.sh /etc/my_init.d/kickstart
